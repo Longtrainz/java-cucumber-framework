@@ -5,6 +5,7 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -21,6 +22,7 @@ public class LoginSteps {
         System.setProperty("webdriver.gecko.driver", "src/test/java/resources/geckodriver.exe");
         this.driver = new FirefoxDriver();
         this.driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         this.driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
     }
 
@@ -64,34 +66,52 @@ public class LoginSteps {
 
 
 
-
-    @Given("^User navigates to stackoverflow website(\\d+)$")
-    public void user_navigates_to_stackoverflow_website(int arg1) throws Throwable {
-        System.out.println("User navigates to stackoverflow website2");
+    @Given("^User access webdriveruniversity website$")
+    public void user_access_webdriverunivesity_website() throws Throwable {
+        driver.get("http://www.webdriveruniversity.com/");
     }
 
-    @Given("^User clicks on the login button on homepage(\\d+)$")
-    public void user_clicks_on_the_login_button_on_homepage(int arg1) throws Throwable {
-        System.out.println("User navigates to stackoverflow website2");
+    @When("^User clicks on Login Portal link$")
+    public void user_clicks_on_Login_Portal_link() throws Throwable {
+        driver.findElement(By.xpath("//h1[text() ='LOGIN PORTAL']")).click();
     }
 
-    @Given("^User enters a valid username(\\d+)$")
-    public void user_enters_a_valid_username(int arg1) throws Throwable {
-        System.out.println("User navigates to stackoverflow website2");
+    @When("^User enters a username$")
+    public void user_enters_a_username() throws Throwable {
+        @SuppressWarnings("unused")
+        String windowHandleBefore = driver.getWindowHandle();
+        //Iterate over window handles and switch to new window
+        for(String windowHandle:driver.getWindowHandles()) {
+            driver.switchTo().window(windowHandle);
+        }
+        driver.findElement(By.id("text")).sendKeys("Tom");
     }
 
-    @Given("^User enters a valid password(\\d+)$")
-    public void user_enters_a_valid_password(int arg1) throws Throwable {
-        System.out.println("User navigates to stackoverflow website2");
+    //accept all Character Upper, Lower and numbers and special characters
+    //send to the variable
+    //saves repeating same method
+    @When("^User enters a \"([^\"]*)\" password$")
+    public void user_enters_a_password(String password) throws Throwable {
+        driver.findElement(By.id("password")).sendKeys(password);
     }
 
-    @When("^User clicks on the login button(\\d+)$")
-    public void user_clicks_on_the_login_button(int arg1) throws Throwable {
-        System.out.println("User navigates to stackoverflow website2");
+    @When("^User clicks on the Login button$")
+    public void user_clicks_on_the_Login_button() throws Throwable {
+        driver.findElement(By.id("login-button")).click();
     }
 
-    @Then("^User should be taken to the successful login page(\\d+)$")
-    public void user_should_be_taken_to_the_successful_login_page(int arg1) throws Throwable {
-        System.out.println("User navigates to stackoverflow website2");
+    @Then("^User should be presented with a successful validation alert$")
+    public void user_should_be_presented_with_a_successful_validation_alert() throws Throwable {
+        Alert alert = driver.switchTo().alert();
+        System.out.println(alert.getText());
+        Assert.assertEquals("validation failed", alert.getText());
     }
+
+    @Then("^User should be presented with an unsuccessful validation alert$")
+    public void user_should_be_presented_with_a_unsuccessful_validation_alert() throws Throwable {
+        Alert alert = driver.switchTo().alert();
+        System.out.println(alert.getText());
+        Assert.assertEquals("validation failed", alert.getText());
+    }
+
 }
